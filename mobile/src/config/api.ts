@@ -81,11 +81,11 @@ export const endpoints = {
     delete: (id: string) => `/stations/${id}`,
   },
   readings: {
-    list: '/readings',
-    get: (id: string) => `/readings/${id}`,
-    create: '/readings',
-    update: (id: string) => `/readings/${id}`,
-    delete: (id: string) => `/readings/${id}`,
+    list: '/daily_readings',
+    get: (id: string) => `/daily_readings/${id}`,
+    create: '/daily_readings',
+    update: (id: string) => `/daily_readings/${id}`,
+    delete: (id: string) => `/daily_readings/${id}`,
   },
   faults: {
     list: '/faults',

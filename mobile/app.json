@@ -56,7 +56,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "your-project-id"
+        "projectId": "operator-app-mobile"
       }
     }
   }
