@@ -1,0 +1,26 @@
+{
+  "name": "operator-app",
+  "version": "1.0.0",
+  "description": "Water services monitoring app for NGO operators",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:web\" \"npm run dev:mobile\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:web": "cd web && npm run dev",
+    "dev:mobile": "cd mobile && npm start",
+    "build": "npm run build:backend && npm run build:web",
+    "build:backend": "cd backend && npm run build",
+    "build:web": "cd web && npm run build",
+    "test": "npm run test:backend",
+    "test:backend": "cd backend && npm test",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "setup": "npm install && cd backend && npm install && cd ../web && npm install && cd ../mobile && npm install"
+  },
+  "keywords": ["water", "monitoring", "ngo", "react-native", "react", "nodejs"],
+  "author": "Operator App Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
