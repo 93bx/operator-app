@@ -4,7 +4,7 @@ import NetInfo from '@react-native-community/netinfo';
 
 const API_BASE_URL = __DEV__ 
   ? 'http://localhost:3001/api' 
-  : 'https://your-production-api.com/api';
+  : 'https://web-production-8a94d.up.railway.app/api';
 
 // Create axios instance
 const api = axios.create({
