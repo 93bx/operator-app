@@ -27,8 +27,15 @@ const PORT = parseInt(process.env.PORT || '3001', 10);
 // Security middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
-  credentials: true
+  origin: [
+    'http://localhost:3000',
+    'https://operator-app-web-git-main-93bxs-projects.vercel.app',
+    'https://operator-app-web.vercel.app',
+    process.env.CORS_ORIGIN
+  ].filter(Boolean),
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 // Rate limiting
