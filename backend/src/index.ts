@@ -84,17 +84,22 @@ app.use(errorHandler);
 // Start server
 async function startServer() {
   try {
+    logger.info('Starting Operator App server...');
+    logger.info(`Environment: ${process.env.NODE_ENV}`);
+    logger.info(`Port: ${PORT}`);
+    
     // Connect to database
     await connectDatabase();
     logger.info('Database connected successfully');
 
     // Start server
-    app.listen(PORT, () => {
-      logger.info(`Server running on port ${PORT}`);
-      logger.info(`Environment: ${process.env.NODE_ENV}`);
+    app.listen(PORT, '0.0.0.0', () => {
+      logger.info(`🚀 Server running on port ${PORT}`);
+      logger.info(`🌍 Environment: ${process.env.NODE_ENV}`);
+      logger.info(`📊 Health check available at: http://localhost:${PORT}/health`);
     });
   } catch (error) {
-    logger.error('Failed to start server:', error);
+    logger.error('❌ Failed to start server:', error);
     process.exit(1);
   }
 }
