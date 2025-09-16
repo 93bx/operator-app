@@ -165,7 +165,7 @@ const seedInitialData = async (pool: any): Promise<void> => {
 
     // Get station IDs for sample data
     const stationsResult = await pool.query('SELECT id FROM stations ORDER BY created_at LIMIT 3');
-    const stationIds = stationsResult.rows.map(row => row.id);
+    const stationIds = stationsResult.rows.map((row: any) => row.id);
 
     // Create sample readings
     for (let i = 0; i < 5; i++) {
