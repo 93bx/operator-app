@@ -10,6 +10,7 @@ import path from 'path';
 import { errorHandler } from './middleware/errorHandler';
 import { logger } from './utils/logger';
 import { connectDatabase } from './config/database';
+import { initDatabase } from './config/initDatabase';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
 import stationRoutes from './routes/stations';
@@ -96,6 +97,10 @@ async function startServer() {
     // Connect to database
     await connectDatabase();
     logger.info('Database connected successfully');
+
+    // Initialize database tables and seed data
+    await initDatabase();
+    logger.info('Database initialized successfully');
 
     // Start server
     app.listen(PORT, '0.0.0.0', () => {
