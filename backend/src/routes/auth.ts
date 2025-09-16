@@ -73,8 +73,10 @@ router.post('/login', async (req, res, next) => {
         email: user.email, 
         role: user.role 
       },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+      process.env.JWT_SECRET as string,
+      { 
+        expiresIn: process.env.JWT_EXPIRES_IN || '7d' 
+      } as jwt.SignOptions
     );
 
     logger.info(`User ${user.email} logged in successfully`);
@@ -202,7 +204,7 @@ router.get('/verify', async (req, res, next) => {
         }
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     if (error.name === 'JsonWebTokenError') {
       next(createError('Invalid token', 401));
     } else if (error.name === 'TokenExpiredError') {

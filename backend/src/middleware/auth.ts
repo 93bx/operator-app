@@ -60,7 +60,7 @@ export const authenticate = async (
     };
 
     next();
-  } catch (error) {
+  } catch (error: any) {
     if (error.name === 'JsonWebTokenError') {
       next(createError('Invalid token', 401));
     } else if (error.name === 'TokenExpiredError') {

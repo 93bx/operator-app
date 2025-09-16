@@ -112,8 +112,8 @@ router.post('/upload', async (req: AuthRequest, res, next) => {
     const { readings = [], faults = [] } = value;
     const pool = getPool();
     const results = {
-      readings: { created: 0, updated: 0, errors: [] },
-      faults: { created: 0, updated: 0, errors: [] }
+      readings: { created: 0, updated: 0, errors: [] as Array<{ id: any; error: string }> },
+      faults: { created: 0, updated: 0, errors: [] as Array<{ id: any; error: string }> }
     };
 
     // Process readings
@@ -181,7 +181,7 @@ router.post('/upload', async (req: AuthRequest, res, next) => {
 
           results.readings.created++;
         }
-      } catch (err) {
+      } catch (err: any) {
         results.readings.errors.push({
           id: reading.id,
           error: err.message
@@ -252,7 +252,7 @@ router.post('/upload', async (req: AuthRequest, res, next) => {
 
           results.faults.created++;
         }
-      } catch (err) {
+      } catch (err: any) {
         results.faults.errors.push({
           id: fault.id,
           error: err.message
