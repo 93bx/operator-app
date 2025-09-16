@@ -4,6 +4,7 @@
   "description": "Water services monitoring app for NGO operators",
   "main": "index.js",
   "scripts": {
+    "start": "cd backend && npm install && npm run build && npm start",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:web\" \"npm run dev:mobile\"",
     "dev:backend": "cd backend && npm run dev",
     "dev:web": "cd web && npm run dev",
