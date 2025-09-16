@@ -1,0 +1,10 @@
+backend/
+mobile/
+docs/
+docker-compose.yml
+railway.json
+Procfile
+.nixpacks.toml
+*.md
+.git/
+node_modules/
