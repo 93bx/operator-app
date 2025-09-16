@@ -35,6 +35,10 @@ export const initDatabase = async (): Promise<void> => {
         location_name_ar VARCHAR(255) NOT NULL,
         latitude DECIMAL(10, 8) NOT NULL,
         longitude DECIMAL(11, 8) NOT NULL,
+        address VARCHAR(500),
+        address_ar VARCHAR(500),
+        capacity_liters INTEGER,
+        operator_id UUID REFERENCES users(id) ON DELETE SET NULL,
         status VARCHAR(20) NOT NULL DEFAULT 'active',
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -132,17 +136,24 @@ const seedInitialData = async (pool: any): Promise<void> => {
       VALUES ($1, $2, $3, $4, $5, $6)
     `, ['operator@operator.com', operatorPasswordHash, 'Operator', 'User', 'operator', true]);
 
+    // Get the operator user ID for assignment
+    const operatorResult = await pool.query('SELECT id FROM users WHERE role = $1', ['operator']);
+    const operatorId = operatorResult.rows[0]?.id;
+
     // Create sample stations
     await pool.query(`
-      INSERT INTO stations (name, name_ar, location_name, location_name_ar, latitude, longitude, status)
+      INSERT INTO stations (name, name_ar, location_name, location_name_ar, latitude, longitude, address, address_ar, capacity_liters, operator_id, status)
       VALUES 
-        ($1, $2, $3, $4, $5, $6, $7),
-        ($8, $9, $10, $11, $12, $13, $14),
-        ($15, $16, $17, $18, $19, $20, $21)
+        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11),
+        ($12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22),
+        ($23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33)
     `, [
-      'Station 1', 'محطة 1', 'Downtown', 'وسط المدينة', 31.2001, 29.9187, 'active',
-      'Station 2', 'محطة 2', 'Industrial Area', 'المنطقة الصناعية', 31.2501, 29.9500, 'active',
-      'Station 3', 'محطة 3', 'Residential Area', 'المنطقة السكنية', 31.1800, 29.9000, 'active'
+      'Station 1', 'محطة 1', 'Downtown', 'وسط المدينة', 31.2001, 29.9187, 
+      '123 Main Street', '123 الشارع الرئيسي', 5000, operatorId, 'active',
+      'Station 2', 'محطة 2', 'Industrial Area', 'المنطقة الصناعية', 31.2501, 29.9500,
+      '456 Industrial Blvd', '456 شارع الصناعية', 8000, operatorId, 'active',
+      'Station 3', 'محطة 3', 'Residential Area', 'المنطقة السكنية', 31.1800, 29.9000,
+      '789 Residential Ave', '789 شارع السكنية', 3000, operatorId, 'active'
     ]);
 
     logger.info('Initial data seeded successfully');
