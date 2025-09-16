@@ -45,9 +45,9 @@ export const initDatabase = async (): Promise<void> => {
       )
     `);
 
-    // Create readings table
+    // Create readings table (daily_readings)
     await pool.query(`
-      CREATE TABLE IF NOT EXISTS readings (
+      CREATE TABLE IF NOT EXISTS daily_readings (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         station_id UUID NOT NULL REFERENCES stations(id) ON DELETE CASCADE,
         operator_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -55,8 +55,10 @@ export const initDatabase = async (): Promise<void> => {
         tds_level DECIMAL(6, 2),
         temperature DECIMAL(5, 2),
         pressure DECIMAL(6, 2),
-        tank_level DECIMAL(5, 2),
+        tank_level_percentage DECIMAL(5, 2),
         notes TEXT,
+        notes_ar TEXT,
+        is_synced BOOLEAN NOT NULL DEFAULT false,
         reading_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -69,11 +71,16 @@ export const initDatabase = async (): Promise<void> => {
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         station_id UUID NOT NULL REFERENCES stations(id) ON DELETE CASCADE,
         reported_by UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        fault_type VARCHAR(100) NOT NULL,
-        description TEXT NOT NULL,
-        severity VARCHAR(20) NOT NULL DEFAULT 'medium',
-        status VARCHAR(20) NOT NULL DEFAULT 'open',
         assigned_to UUID REFERENCES users(id) ON DELETE SET NULL,
+        title VARCHAR(255) NOT NULL,
+        title_ar VARCHAR(255) NOT NULL,
+        description TEXT NOT NULL,
+        description_ar TEXT NOT NULL,
+        priority VARCHAR(20) NOT NULL DEFAULT 'medium',
+        status VARCHAR(20) NOT NULL DEFAULT 'open',
+        latitude DECIMAL(10, 8),
+        longitude DECIMAL(11, 8),
+        photo_url VARCHAR(500),
         resolution_notes TEXT,
         reported_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         resolved_at TIMESTAMP,
@@ -155,6 +162,57 @@ const seedInitialData = async (pool: any): Promise<void> => {
       'Station 3', 'محطة 3', 'Residential Area', 'المنطقة السكنية', 31.1800, 29.9000,
       '789 Residential Ave', '789 شارع السكنية', 3000, operatorId, 'active'
     ]);
+
+    // Get station IDs for sample data
+    const stationsResult = await pool.query('SELECT id FROM stations ORDER BY created_at LIMIT 3');
+    const stationIds = stationsResult.rows.map(row => row.id);
+
+    // Create sample readings
+    for (let i = 0; i < 5; i++) {
+      const stationId = stationIds[i % stationIds.length];
+      const readingDate = new Date();
+      readingDate.setDate(readingDate.getDate() - i);
+      
+      await pool.query(`
+        INSERT INTO daily_readings (station_id, operator_id, ph_level, tds_level, temperature, pressure, tank_level_percentage, notes, notes_ar, reading_date)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      `, [
+        stationId, operatorId,
+        7.2 + (Math.random() - 0.5) * 0.4, // pH between 7.0-7.4
+        150 + Math.random() * 100, // TDS 150-250
+        25 + Math.random() * 10, // Temperature 25-35°C
+        2.5 + Math.random() * 1.0, // Pressure 2.5-3.5 bar
+        60 + Math.random() * 30, // Tank level 60-90%
+        `Reading ${i + 1} - Normal operation`,
+        `قراءة ${i + 1} - تشغيل طبيعي`,
+        readingDate
+      ]);
+    }
+
+    // Create sample faults
+    const faultTitles = [
+      ['Low Water Pressure', 'ضغط ماء منخفض'],
+      ['Temperature Anomaly', 'شذوذ في درجة الحرارة'],
+      ['Equipment Malfunction', 'عطل في المعدات']
+    ];
+
+    for (let i = 0; i < 3; i++) {
+      const stationId = stationIds[i];
+      const [title, titleAr] = faultTitles[i];
+      
+      await pool.query(`
+        INSERT INTO faults (station_id, reported_by, title, title_ar, description, description_ar, priority, status, latitude, longitude)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      `, [
+        stationId, operatorId, title, titleAr,
+        `Fault description ${i + 1} - Equipment needs attention`,
+        `وصف العطل ${i + 1} - المعدات تحتاج إلى انتباه`,
+        ['medium', 'high', 'low'][i],
+        ['open', 'assigned', 'in_progress'][i],
+        31.2001 + (Math.random() - 0.5) * 0.01,
+        29.9187 + (Math.random() - 0.5) * 0.01
+      ]);
+    }
 
     logger.info('Initial data seeded successfully');
     logger.info('Admin credentials: admin@operator.com / admin123');
